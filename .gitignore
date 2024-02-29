@@ -1,0 +1,7 @@
+.bsp/
+.idea/
+.scalafmt.conf
+build.sbt
+mainProject/
+project/
+target/
