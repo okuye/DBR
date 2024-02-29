@@ -5,4 +5,7 @@ import zio.Task
 
 trait AccountService {
   def getAccountDetails(accountId: String): Task[Option[AccountDetail]]
+  def createTransaction(
+      request: TransactionRequest
+  ): Task[Either[String, TransactionResponse]]
 }

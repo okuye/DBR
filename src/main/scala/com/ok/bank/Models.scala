@@ -7,3 +7,16 @@ case class AccountDetail(
     balance: BigDecimal,
     userDetail: UserDetail
 )
+
+case class TransactionRequest(
+    accountId: String,
+    amount: BigDecimal,
+    description: String
+)
+case class TransactionResponse(
+    transactionId: String,
+    accountId: String,
+    amount: BigDecimal,
+    status: String,
+    description: String
+)

@@ -5,15 +5,39 @@ import zio.Task
 import scala.util.control.NonFatal
 
 class AccountServiceImpl extends AccountService {
-  override def getAccountDetails(accountId: String): Task[Option[AccountDetail]] =
+  override def getAccountDetails(
+      accountId: String
+  ): Task[Option[AccountDetail]] =
+    Task
+      .effect {
+        AccountDatabase.mockAccountsDb.get(accountId)
+      }
+      .catchSome { case NonFatal(e) =>
+        Task.fail(
+          e
+        )
+      }
+
+  override def createTransaction(
+      request: TransactionRequest
+  ): Task[Either[String, TransactionResponse]] =
     Task.effect {
-      // Placeholder for actual database call
-      // For demonstration, still using the mock database
-      AccountDatabase.mockAccountsDb.get(accountId)
-    }.catchSome {
-      case NonFatal(e) =>
-        // Log the error, return None, or handle the error as required
-        Task.fail(e) // Re-throwing the exception here, but you might choose to handle it differently
+      AccountDatabase.mockAccountsDb.get(request.accountId) match {
+        case Some(account) if account.balance >= request.amount =>
+          Right(
+            TransactionResponse(
+              "txn-12345",
+              request.accountId,
+              request.amount,
+              "COMPLETED",
+              request.description
+            )
+          )
+        case Some(_) =>
+          Left("Insufficient funds")
+        case None =>
+          Left("Account not found")
+      }
     }
 }
 
