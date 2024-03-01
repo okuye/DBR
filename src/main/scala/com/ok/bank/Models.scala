@@ -1,9 +1,8 @@
 // Models.scala
 package com.ok.bank
+import io.circe.{Decoder, Encoder}
+
 import java.time.LocalDateTime
-import java.time.LocalDateTime
-import io.circe.generic.auto._
-import io.circe.{Encoder, Decoder}
 import java.time.format.DateTimeFormatter
 
 case class UserDetail(name: String, email: String)
