@@ -132,7 +132,6 @@ object RoutesTest extends DefaultRunnableSpec {
       val request = Request[Task](Method.GET, uri"/transaction/history/123")
       val response =
         routes.run(request).value.map(_.getOrElse(Response.notFound))
-
       for {
         response <- response
         status = response.status
