@@ -1,10 +1,10 @@
 package com.ok.bank
 
-import zio.Task
+import zio.clock.Clock
+import zio.{Schedule, Task}
 
 import java.time.LocalDateTime
 import scala.util.control.NonFatal
-
 
 class AccountServiceImpl extends AccountService {
   override def getAccountDetails(
@@ -14,6 +14,8 @@ class AccountServiceImpl extends AccountService {
       .effect {
         AccountDatabase.mockAccountsDb.get(accountId)
       }
+      .retry(Schedule.recurs(3))
+      .provideLayer(Clock.live)
       .catchSome { case NonFatal(e) =>
         Task.fail(
           e

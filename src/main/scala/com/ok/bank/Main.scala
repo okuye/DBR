@@ -15,8 +15,14 @@ object Main extends zio.App {
   val accountService = new AccountServiceImpl
   val routes = Routes.accountRoutes(accountService) <+>
     Routes.transactionRoutes(accountService) <+>
-    Routes.transactionHistoryRoutes(accountService)
-  val httpApp = routes.orNotFound
+    Routes.transactionHistoryRoutes(accountService) <+>
+    Routes.healthCheckRoutes
+
+  val httpApp = Routes
+    .errorHandling(
+      routes
+    )
+    .orNotFound
 
   // Explicitly create a Timer[Task] instance
   implicit val timer: Timer[Task] = new Timer[Task] {
@@ -53,4 +59,3 @@ object Main extends zio.App {
   def run(args: List[String]): URIO[ZEnv, ExitCode] =
     server.exitCode
 }
-
