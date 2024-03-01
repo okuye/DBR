@@ -42,7 +42,7 @@ object Main extends zio.App {
     ZIO.runtime[ZEnv].flatMap { implicit rts =>
       val ec: ExecutionContext = rts.platform.executor.asEC
       BlazeServerBuilder[Task](ec)
-        .bindHttp(8080, "localhost")
+        .bindHttp(8080, "0.0.0.0")
         .withHttpApp(httpApp)
         .resource
         .toManagedZIO

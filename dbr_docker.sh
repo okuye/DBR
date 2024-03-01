@@ -28,9 +28,23 @@ fi
 echo "Removing any existing Docker containers..."
 docker rm -f scala-app
 
+# Check if port 8080 is being used
+PORT=8080
+PID=$(lsof -ti:$PORT)
+
+if [ ! -z "$PID" ]; then
+  echo "Port $PORT is in use by PID $PID. Attempting to kill..."
+  sudo kill -9 $PID
+
+  if [ $? -ne 0 ]; then
+      echo "Failed to kill process $PID. Please check manually."
+      exit 1
+  fi
+fi
+
 # Step 3: Run the Docker container
 echo "Running Docker container..."
-docker run -d -p 9000:9000 -p 9001:9001 --name scala-app dbr-scala-app:0.1.0-SNAPSHOT
+docker run -d -p 8080:8080 --name scala-app dbr-scala-app:0.1.0-SNAPSHOT
 
 # Check if Docker run succeeded
 if [ $? -eq 0 ]; then
