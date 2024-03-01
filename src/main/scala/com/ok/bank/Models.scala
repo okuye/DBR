@@ -1,5 +1,10 @@
 // Models.scala
 package com.ok.bank
+import java.time.LocalDateTime
+import java.time.LocalDateTime
+import io.circe.generic.auto._
+import io.circe.{Encoder, Decoder}
+import java.time.format.DateTimeFormatter
 
 case class UserDetail(name: String, email: String)
 case class AccountDetail(
@@ -19,4 +24,24 @@ case class TransactionResponse(
     amount: BigDecimal,
     status: String,
     description: String
+)
+
+object Transaction {
+  implicit val encodeLocalDateTime: Encoder[LocalDateTime] =
+    Encoder.encodeLocalDateTimeWithFormatter(
+      DateTimeFormatter.ISO_LOCAL_DATE_TIME
+    )
+  implicit val decodeLocalDateTime: Decoder[LocalDateTime] =
+    Decoder.decodeLocalDateTimeWithFormatter(
+      DateTimeFormatter.ISO_LOCAL_DATE_TIME
+    )
+}
+
+case class Transaction(
+    transactionId: String,
+    accountId: String,
+    amount: BigDecimal,
+    description: String,
+    status: String,
+    timestamp: LocalDateTime
 )

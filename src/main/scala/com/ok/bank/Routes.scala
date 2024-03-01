@@ -44,4 +44,18 @@ object Routes {
     }
   }
 
+  def transactionHistoryRoutes(service: AccountService): HttpRoutes[Task] = {
+    val dsl = new Http4sDsl[Task] {}
+    import dsl._
+
+    HttpRoutes.of[Task] {
+      case GET -> Root / "transaction" / "history" / accountId =>
+        service.getTransactionHistory(accountId).flatMap {
+          case Some(history) => Ok(history)
+          case None => NotFound("Account not found")
+        }
+    }
+  }
+
+
 }

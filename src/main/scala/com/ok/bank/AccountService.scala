@@ -8,4 +8,6 @@ trait AccountService {
   def createTransaction(
       request: TransactionRequest
   ): Task[Either[String, TransactionResponse]]
+
+  def getTransactionHistory(accountId: String): Task[Option[List[Transaction]]]
 }

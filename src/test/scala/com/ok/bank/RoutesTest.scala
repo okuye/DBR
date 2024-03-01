@@ -78,6 +78,31 @@ object RoutesTest extends DefaultRunnableSpec {
         status = response.status
       } yield assert(status)(equalTo(Status.UnprocessableEntity))
     },
+    testM("GET /transaction/history/123 returns transaction history") {
+      val request = Request[Task](Method.GET, uri"/transaction/history/123")
+      // Convert OptionT[Task, Response[Task]] to Task[Response[Task]] by providing a default response for the None case
+      val responseTask: Task[Response[Task]] =
+        routes.run(request).value.map(_.getOrElse(Response.notFound))
+
+      // Extract the status from the response
+      val statusTask: Task[Status] = responseTask.map(_.status)
+
+      // Use assertM to check the status, ensuring that we are working with a Task[Status]
+      assertM(statusTask)(equalTo(Status.Ok))
+    },
+    testM("GET /transaction/history/non-existing returns 404") {
+      val request =
+        Request[Task](Method.GET, uri"/transaction/history/non-existing")
+      // Convert OptionT[Task, Response[Task]] to Task[Response[Task]] by providing a default response for the None case
+      val responseTask: Task[Response[Task]] =
+        routes.run(request).value.map(_.getOrElse(Response.notFound))
+
+      // Extract the status from the response
+      val statusTask: Task[Status] = responseTask.map(_.status)
+
+      // Use assertM to check the status, ensuring that we are working with a Task[Status]
+      assertM(statusTask)(equalTo(Status.NotFound))
+    },
     testM("GET /account/123 returns 200 and account details") {
       val request = Request[Task](Method.GET, uri"/account/123")
       val response = Routes.accountRoutes(testService).orNotFound.run(request)
