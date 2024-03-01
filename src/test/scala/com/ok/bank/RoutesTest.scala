@@ -5,6 +5,7 @@ import com.ok.bank.Main.routes
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s._
+import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.circe.{jsonEncoder, jsonOf}
 import org.http4s.implicits._
 import zio._
@@ -124,6 +125,32 @@ object RoutesTest extends DefaultRunnableSpec {
         Routes.accountRoutes(testService).orNotFound.run(request).map(_.status)
 
       assertM(response)(equalTo(Status.NotFound))
+    },
+    testM(
+      "GET /transaction/history/123 returns transaction history for existing account"
+    ) {
+      val request = Request[Task](Method.GET, uri"/transaction/history/123")
+      val response =
+        routes.run(request).value.map(_.getOrElse(Response.notFound))
+
+      for {
+        response <- response
+        status = response.status
+        transactions <- response.as[List[
+          Transaction
+        ]] // Assuming you have an appropriate decoder for List[Transaction]
+      } yield assert(status)(equalTo(Status.Ok)) &&
+        assert(transactions.nonEmpty)(isTrue)
+    },
+    testM(
+      "GET /transaction/history/non-existing returns 404 for non-existing account"
+    ) {
+      val request =
+        Request[Task](Method.GET, uri"/transaction/history/non-existing")
+      val response =
+        routes.run(request).value.map(_.getOrElse(Response.notFound))
+
+      assertM(response.map(_.status))(equalTo(Status.NotFound))
     }
   )
 }
